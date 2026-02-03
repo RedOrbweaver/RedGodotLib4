@@ -163,7 +163,7 @@ public static partial class Utils
 		}
 		public UTimer(double delay_seconds, Action onhit, bool repeating = false)
 		{
-			Delay = (UInt64)(delay_seconds * UtilsRunner.TICKS_PER_SECOND_D);
+			Delay = (UInt64)(delay_seconds * (double)UtilsRunner.TICKS_PER_SECOND);
 			OnHit = onhit;
 			Repeating = repeating;
 		}
@@ -176,7 +176,7 @@ public static partial class Utils
 
 		public UTimer(TimeSpan span, Action onhit, bool repeating = false)
 		{
-			Delay = (UInt64)((double)span.Ticks / (double)TimeSpan.TicksPerSecond * UtilsRunner.TICKS_PER_SECOND_D);
+			Delay = (UInt64)((double)span.Ticks / (double)TimeSpan.TicksPerSecond * (double)UtilsRunner.TICKS_PER_SECOND);
 			OnHit = onhit;
 			Repeating = repeating;
 		}

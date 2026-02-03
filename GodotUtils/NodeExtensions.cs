@@ -56,9 +56,9 @@ public static partial class Utils
     public static List<T> GetChildren<T>(this Node root) where T : Node
     {
         List<T> ret = new List<T>(8);
-        foreach(var it in root.GetChildren())
+        foreach (var it in root.GetChildren())
         {
-            if(it is T t)
+            if (it is T t)
                 ret.Add(t);
         }
         return ret;
@@ -98,8 +98,8 @@ public static partial class Utils
         return parent.FindChildren(pattern, typeof(T).FullName, true, true).Convert<T, Node>();
     }
     public static List<T> FindChildren<T>(this Node parent, string pattern, bool recursive = false) where T : Node
-    {   
-        if(recursive)
+    {
+        if (recursive)
             return FindChildrenRecursively<T>(parent, pattern);
         return parent.FindChildren(pattern, typeof(T).FullName, false).Convert<T, Node>();
     }
@@ -113,7 +113,7 @@ public static partial class Utils
     }
     public static bool LoseParent(this Node node)
     {
-        if(node.GetParent() is Node parent)
+        if (node.GetParent() is Node parent)
         {
             parent.RemoveChild(node);
             return true;
@@ -122,9 +122,20 @@ public static partial class Utils
     }
     public static void StealChild(this Node node, Node other)
     {
-        if(other.GetParent() is Node parent)
+        if (other.GetParent() is Node parent)
             parent.RemoveChild(other);
         node.AddChild(other);
+    }
+    public static T GetNodeSafe<T>(this Node root, NodePath path, string not_found_message) where T : Node
+    {
+        Node node = root.GetNodeOrNull(path);
+        Assert(node != null, not_found_message);
+        Assert(node is T, $"Node {path} was not of type {typeof(T).Name}");
+        return (T)node;
+    }
+    public static T GetNodeSafe<T>(this Node root, NodePath path) where T : Node
+    {
+        return root.GetNodeSafe<T>(path, $"Could not find node: {path}");
     }
 
 }
