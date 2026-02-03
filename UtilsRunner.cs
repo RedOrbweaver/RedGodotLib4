@@ -6,11 +6,16 @@ using System.Collections.Generic;
 [Tool]
 public partial class UtilsRunner : Node
 {
-    public static UtilsRunner GUR; public const UInt64 TICKS_PER_SECOND = 1000000;
-    public const double TICKS_PER_SECOND_D = 1000000.0;
-    public double CurrentTimeSEC => ((double)GlobalTime) / (double)TICKS_PER_SECOND;
-    public double CurrentTimeMSEC => ((double)GlobalTime) / (double)TICKS_PER_SECOND / 1000.0;
-    public UInt64 GlobalTime { get; private set; }
+    public static UtilsRunner GUR;
+    public const UInt64 TICKS_PER_SECOND = 1000 * 1000 * 1000;
+    public UInt64 GlobalTime { get; private set; } = 0;
+    public UInt64 PhysicsTime { get; private set; } = 0;
+    public double CurrentTimeUSEC => (double)(GlobalTime / (TICKS_PER_SECOND / 1000 / 10)) / 100.0;
+    public double CurrentTimeMSEC => CurrentTimeUSEC * 1000;
+    public double CurrentTimeSEC => CurrentTimeMSEC * 1000;
+    public double CurrentPhysicsTimeSEC => PhysicsTime / (TICKS_PER_SECOND / 1000000);
+    public double CurrentPhysicsTimeMSEC => CurrentPhysicsTimeSEC / 1000.0;
+    public double CurrentPhysicsTimeUSEC => CurrentPhysicsTimeMSEC / 1000.0;
     List<UTimer> _timers = new List<UTimer>();
     ConcurrentQueue<Action> _toExec = new ConcurrentQueue<Action>();
     void DequeDeferred()
@@ -107,9 +112,13 @@ public partial class UtilsRunner : Node
     public override void _Process(double delta)
     {
         base._Process(delta);
-        double ddelta = ((double)delta) * TICKS_PER_SECOND * 1000;
-        GlobalTime += (UInt64)(ddelta / 1000);
+        GlobalTime += (UInt64)(delta * TICKS_PER_SECOND);
         ProcessTimers();
+    }
+    public override void _PhysicsProcess(double delta)
+    {
+        base._PhysicsProcess(delta);
+        PhysicsTime += (UInt64)(delta * TICKS_PER_SECOND);
     }
     public override void _Ready()
     {
@@ -118,7 +127,7 @@ public partial class UtilsRunner : Node
     }
     public UtilsRunner()
     {
-        
+        GUR = this;
     }
 
 }
