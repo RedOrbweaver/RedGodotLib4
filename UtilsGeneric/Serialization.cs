@@ -19,7 +19,7 @@ using Newtonsoft.Json.Serialization;
 
 public static partial class Utils
 {
-    public static string SerializeToString<T>(T o, bool humanreadible = false, bool typedata = true) where T : class
+    public static string SerializeToString<T>(T o, bool humanreadible = false, bool typedata = true, bool ignore_errors = false) where T : class
     {
         List<string> errors = new List<string>();
         void ErrorHandler(object sender, ErrorEventArgs e)
@@ -34,11 +34,14 @@ public static partial class Utils
             Error = ErrorHandler,
         };
         var ret = JsonConvert.SerializeObject(o, settings);
-        if(errors.Count > 0)
+        if(!ignore_errors && errors.Count > 0)
         {
-            string msg = $"{errors.Count} errors during serialization of {o}";
-            Console.WriteLine(msg);
-            throw new Exception(msg);
+            Console.WriteLine($"{errors.Count} errors during serialization of {o}:");
+			foreach (var err in errors)
+			{
+				Console.WriteLine(err.ToString());
+			}	
+            throw new Exception($"{errors.Count} errors during serialization of {o}");
         }
         return ret;
     }
