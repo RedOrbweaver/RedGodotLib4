@@ -15,6 +15,7 @@ using Expression = System.Linq.Expressions.Expression;
 using System.Threading.Tasks;
 using System.ComponentModel;
 using Newtonsoft.Json;
+using System.ComponentModel.DataAnnotations;
 
 public static partial class Utils
 {
@@ -201,6 +202,60 @@ public static partial class Utils
 				if(property.GetCustomAttribute<T>() != null)
 					ret.Add(property);
 			}
+		}
+		return ret;
+	}
+	public static List<PropertyInfo> GetAllProperties<T>(bool includestatic = false) where T : class
+	{
+		var type = typeof(T);
+		return [.. type.GetProperties((includestatic ? BindingFlags.Static : 0) | BindingFlags.NonPublic | BindingFlags.Public)];
+	}
+	public static object GetPropertyValue<T>(T obj, PropertyInfo p) where T : class
+	{
+		Assert(p.CanRead);
+		return p.GetGetMethod(true).Invoke(obj, null);
+	}
+	public static void ForEachProperty<T>(Action<PropertyInfo> f, Func<PropertyInfo, bool> filter = null) where T : class
+	{
+		foreach (var p in GetAllProperties<T>())
+		{
+			if (filter != null && !filter(p))
+				continue;
+			f(p);
+		}
+	}
+	public static void ForEachProperty<T>(T obj, Action<object> f, Func<PropertyInfo, bool> filter = null) where T : class
+	{
+		foreach (var p in GetAllProperties<T>())
+		{
+			if (!p.CanRead)
+				continue;
+			if (filter != null && !filter(p))
+				continue;
+			f(GetPropertyValue(obj, p));
+		}
+	}
+	public static void ForEachProperty<T, R>(T obj, Action<R> f, bool exact = false, Func<PropertyInfo, bool> filter = null) where T : class
+	{
+		foreach (var p in GetAllProperties<T>())
+		{
+			if (!p.CanRead)
+				continue;
+			var rt = p.GetGetMethod().ReturnType;
+			if (rt != typeof(R) && (exact || !rt.IsAssignableTo(typeof(R))))
+				continue;
+			if (filter != null && !filter(p))
+					continue;
+			f((R)GetPropertyValue(obj, p));
+		}
+	}
+	public static List<Type> FindAllInheritingTypes<T>(bool includeabstract = true)
+	{
+		List<Type> ret = new List<Type>();
+		foreach (var type in Assembly.GetExecutingAssembly().GetTypes())
+		{
+			if ((includeabstract || !type.IsAbstract) && type.IsSubclassOf(typeof(T)))
+				ret.Add(type);
 		}
 		return ret;
 	}
