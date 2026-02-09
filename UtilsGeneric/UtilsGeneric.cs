@@ -208,7 +208,7 @@ public static partial class Utils
 	public static List<PropertyInfo> GetAllProperties<T>(bool includestatic = false) where T : class
 	{
 		var type = typeof(T);
-		return [.. type.GetProperties((includestatic ? BindingFlags.Static : 0) | BindingFlags.NonPublic | BindingFlags.Public)];
+		return [.. type.GetProperties((includestatic ? BindingFlags.Static : 0) | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance)];
 	}
 	public static object GetPropertyValue<T>(T obj, PropertyInfo p) where T : class
 	{
