@@ -137,6 +137,18 @@ public static partial class Utils
     {
         return root.GetNodeSafe<T>(path, $"Could not find node: {path}");
     }
+    public static T GetOrCreateChild<T>(this Node root, string name, bool add_as_child = true) where T : Node, new()
+    {
+        if (root.GetNodeOrNull(name) is T child)
+        {
+            return child;
+        }
+        T nchild = new();
+        nchild.Name = name;
+        if (add_as_child)
+            root.AddChild(nchild);
+        return nchild;
+    }
 
 }
 #endif
