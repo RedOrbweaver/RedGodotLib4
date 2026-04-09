@@ -16,6 +16,7 @@ using System.Threading.Tasks;
 using System.ComponentModel;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using FileAccess = Godot.FileAccess;
 
 #if GODOT
 using Godot;
