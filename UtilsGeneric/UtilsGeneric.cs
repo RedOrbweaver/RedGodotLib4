@@ -16,6 +16,9 @@ using System.Threading.Tasks;
 using System.ComponentModel;
 using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
+#if GODOT
+using Godot;
+#endif
 
 public static partial class Utils
 {
